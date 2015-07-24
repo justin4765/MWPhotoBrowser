@@ -17,6 +17,14 @@
 
 static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
+@interface MWPhotoBrowser ()
+
+@property (nonatomic ,strong) NSMutableArray *selectedPhotos;
+
+@property (nonatomic) BOOL hiddenForNavigationBar;
+
+@end
+
 @implementation MWPhotoBrowser
 
 #pragma mark - Init
@@ -82,6 +90,13 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     _didSavePreviousStateOfNavBar = NO;
     self.automaticallyAdjustsScrollViewInsets = NO;
     
+    _selectedPhotos = [NSMutableArray array];
+    _hiddenForNavigationBar = NO;
+    _hideToolbar = NO;
+    _currentThumbnailFrame = CGRectNull;
+    _currentThumbnailImageKey = nil;
+    _selectionMaximum = @9;
+
     // Listen for MWPhoto notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleMWPhotoLoadingDidEndNotification:)
@@ -232,6 +247,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         previousViewController.navigationItem.backBarButtonItem = newBackButton;
     }
 
+    if (_displaySelectionButtons) {
+        UIBarButtonItem *sendButton = [[UIBarButtonItem alloc] initWithTitle:@"发送" style:UIBarButtonItemStylePlain target:self action:@selector(handleSendButton:)];
+        self.navigationItem.rightBarButtonItem = sendButton;
+    }
+    
     // Toolbar items
     BOOL hasItems = NO;
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
@@ -278,7 +298,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             break;
         }
     }
-    if (hideToolbar) {
+    if (hideToolbar || self.hideToolbar) {
         [_toolbar removeFromSuperview];
     } else {
         [self.view addSubview:_toolbar];
@@ -409,6 +429,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     // Controls
     [self.navigationController.navigationBar.layer removeAllAnimations]; // Stop all animations on nav bar
     [NSObject cancelPreviousPerformRequestsWithTarget:self]; // Cancel any pending toggles from taps
+    _hiddenForNavigationBar = NO;
     [self setControlsHidden:NO animated:NO permanent:YES];
     
     // Status bar
@@ -416,6 +437,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle animated:animated];
     }
     
+    [_selectedPhotos removeAllObjects];
+
 	// Super
 	[super viewWillDisappear:animated];
     
@@ -436,13 +459,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (void)setNavBarAppearance:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:animated];
     UINavigationBar *navBar = self.navigationController.navigationBar;
-    navBar.tintColor = [UIColor whiteColor];
-    navBar.barTintColor = nil;
-    navBar.shadowImage = nil;
+    navBar.tintColor = UIColorFromHex(kColor01);
+    navBar.barTintColor = UIColorFromHex(kColor00);
+    UIImage *image = [UIImage imageForResourcePath:@"MWPhotoBrowser.bundle/UIBarButtonItemBack" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]];
+    navBar.backIndicatorImage = image;
+    navBar.backIndicatorTransitionMaskImage = image;
     navBar.translucent = YES;
-    navBar.barStyle = UIBarStyleBlackTranslucent;
-    [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-    [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
 }
 
 - (void)storePreviousNavBarAppearance {
@@ -696,9 +718,27 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)setPhotoSelected:(BOOL)selected atIndex:(NSUInteger)index {
     if (_displaySelectionButtons) {
+        if (selected && _selectedPhotos.count >= self.selectionMaximum.unsignedIntegerValue) {
+            
+            if (_gridController) {
+                [_gridController.collectionView reloadData];
+            }
+            
+            [self showSelectionMaximumAlertView];
+            return;
+        }
         if ([self.delegate respondsToSelector:@selector(photoBrowser:photoAtIndex:selectedChanged:)]) {
             [self.delegate photoBrowser:self photoAtIndex:index selectedChanged:selected];
         }
+        MWPhoto *photo = [self photoAtIndex:index];
+        if (selected) {
+            [_selectedPhotos addObject:photo];
+        } else {
+            [_selectedPhotos removeObject:photo];
+        }
+        
+        NSString *title = [NSString stringWithFormat:@"选择照片(%@/%@)", @(_selectedPhotos.count), self.selectionMaximum];
+        self.title = title;
     }
 }
 
@@ -906,6 +946,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 // Handle page changes
 - (void)didStartViewingPageAtIndex:(NSUInteger)index {
     
+    if (!_displaySelectionButtons) {
+        _hiddenForNavigationBar = YES;
+    }
+
     // Handle 0 photos
     if (![self numberOfPhotos]) {
         // Show controls
@@ -1077,21 +1121,22 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     NSUInteger numberOfPhotos = [self numberOfPhotos];
     if (_gridController) {
         if (_gridController.selectionMode) {
-            self.title = NSLocalizedString(@"Select Photos", nil);
+            NSString *title = [NSString stringWithFormat:@"选择照片(%@/%@)", @(_selectedPhotos.count), self.selectionMaximum];
+            self.title = title;
         } else {
-            NSString *photosText;
-            if (numberOfPhotos == 1) {
-                photosText = NSLocalizedString(@"photo", @"Used in the context: '1 photo'");
-            } else {
-                photosText = NSLocalizedString(@"photos", @"Used in the context: '3 photos'");
-            }
-            self.title = [NSString stringWithFormat:@"%lu %@", (unsigned long)numberOfPhotos, photosText];
+            NSString *title = @"聊天图片";
+            self.title = title;
         }
     } else if (numberOfPhotos > 1) {
         if ([_delegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
             self.title = [_delegate photoBrowser:self titleForPhotoAtIndex:_currentPageIndex];
         } else {
-            self.title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(_currentPageIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long)numberOfPhotos];
+            if (_displaySelectionButtons) {
+                NSString *title = [NSString stringWithFormat:@"选择照片(%@/%@)", @(_selectedPhotos.count), self.selectionMaximum];
+                self.title = title;
+            } else {
+                self.title = [NSString stringWithFormat:@"%lu/%lu", (unsigned long)(_currentPageIndex+1), (unsigned long)numberOfPhotos];
+            }
         }
 	} else {
 		self.title = nil;
@@ -1146,6 +1191,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)selectedButtonTapped:(id)sender {
     UIButton *selectedButton = (UIButton *)sender;
+    if (!selectedButton.isSelected && _selectedPhotos.count >= self.selectionMaximum.unsignedIntegerValue) {
+        [self showSelectionMaximumAlertView];
+        return;
+    }
     selectedButton.selected = !selectedButton.selected;
     NSUInteger index = NSUIntegerMax;
     for (MWZoomingScrollView *page in _visiblePages) {
@@ -1283,6 +1332,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)showGrid:(BOOL)animated {
 
+    _hiddenForNavigationBar = NO;
+
     if (_gridController) return;
     
     // Init grid controller
@@ -1331,6 +1382,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)hideGrid {
     
+    if (!_displaySelectionButtons) {
+        _hiddenForNavigationBar = YES;
+    }
+
     if (!_gridController) return;
     
     // Remember previous content offset
@@ -1377,6 +1432,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     if (![self numberOfPhotos] || _gridController || _alwaysShowControls)
         hidden = NO;
     
+    BOOL hiddenForNavigationBar = _hiddenForNavigationBar;
+    if (!hiddenForNavigationBar) {
+        hiddenForNavigationBar = hidden;
+    }
+
     // Cancel any timers
     [self cancelControlHiding];
     
@@ -1391,12 +1451,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         if (!_isVCBasedStatusBarAppearance) {
             
             // Non-view controller based
-            [[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:animated ? UIStatusBarAnimationSlide : UIStatusBarAnimationNone];
+            [[UIApplication sharedApplication] setStatusBarHidden:hiddenForNavigationBar withAnimation:animated ? UIStatusBarAnimationSlide : UIStatusBarAnimationNone];
             
         } else {
             
             // View controller based so animate away
-            _statusBarShouldBeHidden = hidden;
+            _statusBarShouldBeHidden = hiddenForNavigationBar;
             [UIView animateWithDuration:animationDuration animations:^(void) {
                 [self setNeedsStatusBarAppearanceUpdate];
             } completion:^(BOOL finished) {}];
@@ -1429,7 +1489,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         CGFloat alpha = hidden ? 0 : 1;
 
         // Nav bar slides up on it's own on iOS 7+
-        [self.navigationController.navigationBar setAlpha:alpha];
+        [self.navigationController.navigationBar setAlpha:(hiddenForNavigationBar ? 0 : 1)];
         
         // Toolbar
         _toolbar.frame = [self frameForToolbarAtOrientation:self.interfaceOrientation];
@@ -1503,7 +1563,13 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (BOOL)areControlsHidden { return (_toolbar.alpha == 0); }
 - (void)hideControls { [self setControlsHidden:YES animated:YES permanent:NO]; }
 - (void)showControls { [self setControlsHidden:NO animated:YES permanent:NO]; }
-- (void)toggleControls { [self setControlsHidden:![self areControlsHidden] animated:YES permanent:NO]; }
+- (void)toggleControls {
+    if (!_gridController && !_displaySelectionButtons) {
+        [self dismissViewController];
+    } else {
+        [self setControlsHidden:![self areControlsHidden] animated:YES permanent:NO];
+    }
+}
 
 #pragma mark - Properties
 
@@ -1637,6 +1703,61 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [self.progressHUD hide:YES];
     }
     self.navigationController.navigationBar.userInteractionEnabled = YES;
+}
+
+#pragma mark - Customized
+
+- (void)handleSendButton:(id)sender
+{
+    if ([_delegate respondsToSelector:@selector(photoBrowser:didFinishSelectPhotos:)]) {
+        // Call delegate method and let them dismiss us
+        [_delegate photoBrowser:self didFinishSelectPhotos:_selectedPhotos];
+    }
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)dismissViewController
+{
+    if (CGRectIsNull(self.currentThumbnailFrame) || IsEmpty(self.currentThumbnailImageKey)) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    } else {
+        WEAKESELF
+        
+        UIImage *image = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:self.currentThumbnailImageKey];
+        if (IsEmpty(image)) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                weakSelf.currentThumbnailFrame = CGRectNull;
+                weakSelf.currentThumbnailImageKey = nil;
+            }];
+        } else {
+            UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+            UIImageView *tempView = [[UIImageView alloc] initWithImage:image];
+            CGFloat height = (kScreenWidth / image.size.width) * image.size.height;
+            tempView.bounds = CGRectMake(0, 0, kScreenWidth, height);
+            tempView.center = keyWindow.center;
+            [keyWindow addSubview:tempView];
+            
+            [UIView animateWithDuration:0.3f animations:^{
+                tempView.frame = weakSelf.currentThumbnailFrame;
+            } completion:^(BOOL finished) {
+                [tempView removeFromSuperview];
+            }];
+            
+            [self dismissViewControllerAnimated:NO completion:^{
+                weakSelf.currentThumbnailFrame = CGRectNull;
+                weakSelf.currentThumbnailImageKey = nil;
+            }];
+        }
+    }
+}
+
+- (void)showSelectionMaximumAlertView
+{
+    NSString *message = [NSString stringWithFormat:@"你最多只能选择%@张照片", self.selectionMaximum];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:message delegate:self cancelButtonTitle:@"我知道了" otherButtonTitles:nil];
+    
+    [alertView show];
 }
 
 @end

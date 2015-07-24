@@ -258,6 +258,10 @@
 		BD2C1F30112772208242F8D3 /* MWTapDetectingImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = D34FFFB79653ECFD50F775EC /* MWTapDetectingImageView.h */; };
 		BEC3F3210B4ECD617D46842B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFFE75A44D43022A03A54BCB /* Foundation.framework */; };
 		C00EA1326CE11B13223E2F4E /* SDWebImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3331937B99A7733D10CA7 /* SDWebImageDownloader.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		C05AD7391B6242CA00C64D1D /* UIBarButtonItemBack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C05AD7371B6242CA00C64D1D /* UIBarButtonItemBack@2x.png */; };
+		C05AD73A1B6242CA00C64D1D /* UIBarButtonItemBack@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C05AD7381B6242CA00C64D1D /* UIBarButtonItemBack@3x.png */; };
+		C05AD73B1B6242DC00C64D1D /* UIBarButtonItemBack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C05AD7371B6242CA00C64D1D /* UIBarButtonItemBack@2x.png */; };
+		C05AD73C1B6242DE00C64D1D /* UIBarButtonItemBack@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C05AD7381B6242CA00C64D1D /* UIBarButtonItemBack@3x.png */; };
 		C3E71CF5BB3624F1B0631041 /* EXPMatchers+beNil.m in Sources */ = {isa = PBXBuildFile; fileRef = 78E726AA802A5E638E455542 /* EXPMatchers+beNil.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		C4F2CF1ACF3B3C845EC3A616 /* EXPMatchers+beLessThan.h in Headers */ = {isa = PBXBuildFile; fileRef = 836B8F3E9C10367727492164 /* EXPMatchers+beLessThan.h */; };
 		C50809598B17A53A691B5DC2 /* EXPMatchers+haveCountOf.m in Sources */ = {isa = PBXBuildFile; fileRef = 82711CB244F2E93A94A5EAA7 /* EXPMatchers+haveCountOf.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -722,6 +726,8 @@
 		B99BB4F2E583A31B93F51A1E /* NSValue+Expecta.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSValue+Expecta.h"; path = "Expecta/NSValue+Expecta.h"; sourceTree = "<group>"; };
 		BBDEAC4A4EE2C77CCC635727 /* EXPMatchers+beginWith.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "EXPMatchers+beginWith.m"; path = "Expecta/Matchers/EXPMatchers+beginWith.m"; sourceTree = "<group>"; };
 		BDBE20AB39D3E5E6A45775F2 /* ImageSelectedSmallOn@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ImageSelectedSmallOn@2x.png"; sourceTree = "<group>"; };
+		C05AD7371B6242CA00C64D1D /* UIBarButtonItemBack@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIBarButtonItemBack@2x.png"; sourceTree = "<group>"; };
+		C05AD7381B6242CA00C64D1D /* UIBarButtonItemBack@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "UIBarButtonItemBack@3x.png"; sourceTree = "<group>"; };
 		C05FE91D6D72B6E790C45A50 /* Pods-MWPhotoBrowser_Example-MBProgressHUD-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-MWPhotoBrowser_Example-MBProgressHUD-prefix.pch"; sourceTree = "<group>"; };
 		C0ED85B8920BFCB1E4FCE785 /* Pods-MWPhotoBrowser_Tests-MWPhotoBrowser-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MWPhotoBrowser_Tests-MWPhotoBrowser-Private.xcconfig"; path = "../Pods-MWPhotoBrowser_Tests-MWPhotoBrowser/Pods-MWPhotoBrowser_Tests-MWPhotoBrowser-Private.xcconfig"; sourceTree = "<group>"; };
 		C0FA329DC1270AEA5AEA08F7 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -966,6 +972,8 @@
 				D061EEB4FFCB820F541F2B16 /* UIBarButtonItemArrowRight.png */,
 				AF83DE5A8897317A83FE34BB /* UIBarButtonItemArrowRight@2x.png */,
 				A1F61F563D45757DB78EF444 /* UIBarButtonItemArrowRight@3x.png */,
+				C05AD7371B6242CA00C64D1D /* UIBarButtonItemBack@2x.png */,
+				C05AD7381B6242CA00C64D1D /* UIBarButtonItemBack@3x.png */,
 				2E6AB667A9F97773781EEC1B /* UIBarButtonItemGrid.png */,
 				1EB1CB2A3D54B0EBAF54F0D9 /* UIBarButtonItemGrid@2x.png */,
 				7F5075C4D65A78E71D4043E5 /* UIBarButtonItemGrid@3x.png */,
@@ -2036,7 +2044,9 @@
 				4637B24B0C08B18FDFB6A24D /* ImageSelectedOn@3x.png in Resources */,
 				F08FBD236019B5BF8CA77A8F /* ImageSelectedSmallOff.png in Resources */,
 				1DBA8D590CB494A44C9D6A66 /* ImageSelectedSmallOff@2x.png in Resources */,
+				C05AD73C1B6242DE00C64D1D /* UIBarButtonItemBack@3x.png in Resources */,
 				729E9F5AC6C28BFFF67CD4D6 /* ImageSelectedSmallOff@3x.png in Resources */,
+				C05AD73B1B6242DC00C64D1D /* UIBarButtonItemBack@2x.png in Resources */,
 				0D416732B959FA5E0D54275F /* ImageSelectedSmallOn.png in Resources */,
 				E73C59FDBB43E2703459FCBB /* ImageSelectedSmallOn@2x.png in Resources */,
 				B5EAB70DE06DC6CC1A7612DD /* ImageSelectedSmallOn@3x.png in Resources */,
@@ -2076,7 +2086,9 @@
 				152BF47A5ACAB1D3418DD504 /* ImageSelectedOn@3x.png in Resources */,
 				A07714262E778603B2C734E0 /* ImageSelectedSmallOff.png in Resources */,
 				D95F975FAB619E14E05F9EF3 /* ImageSelectedSmallOff@2x.png in Resources */,
+				C05AD73A1B6242CA00C64D1D /* UIBarButtonItemBack@3x.png in Resources */,
 				492537117CBD8B8978CF9739 /* ImageSelectedSmallOff@3x.png in Resources */,
+				C05AD7391B6242CA00C64D1D /* UIBarButtonItemBack@2x.png in Resources */,
 				7B5A9B635AF5DA882726B381 /* ImageSelectedSmallOn.png in Resources */,
 				2202ADA351AF98D7F8A29942 /* ImageSelectedSmallOn@2x.png in Resources */,
 				904BAFD0CF427DDAF4642B83 /* ImageSelectedSmallOn@3x.png in Resources */,
