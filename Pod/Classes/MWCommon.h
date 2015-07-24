@@ -17,6 +17,9 @@
 
 #define kScreenWidth CGRectGetWidth([UIScreen mainScreen].bounds)
 
+static int const kColor00 = 0xffffff;
+static int const kColor01 = 0xed5172;//爱员工红
+
 static inline BOOL IsEmpty(id thing) {
     return thing == nil || [thing isEqual:[NSNull null]]
     || ([thing respondsToSelector:@selector(length)]
