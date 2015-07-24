@@ -458,13 +458,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)setNavBarAppearance:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:animated];
-    UINavigationBar *navBar = self.navigationController.navigationBar;
-    navBar.tintColor = UIColorFromHex(kColor01);
-    navBar.barTintColor = UIColorFromHex(kColor00);
-    UIImage *image = [UIImage imageForResourcePath:@"MWPhotoBrowser.bundle/UIBarButtonItemBack" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]];
-    navBar.backIndicatorImage = image;
-    navBar.backIndicatorTransitionMaskImage = image;
-    navBar.translucent = YES;
 }
 
 - (void)storePreviousNavBarAppearance {
