@@ -10,18 +10,9 @@ Pod::Spec.new do |s|
                   The photo browser handles the downloading and caching of photos from the web seamlessly.
                   Photos can be zoomed and panned, and optional (customisable) captions can be displayed.
                   DESCRIPTION
-  s.screenshots = [
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser1.png',
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser2.png',
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser3.png',
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser4.png',
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser5.png',
-    'https://raw.github.com/mwaterfall/MWPhotoBrowser/master/Screenshots/MWPhotoBrowser6.png'
-  ]
 
   s.homepage = 'https://github.com/justin4765/MWPhotoBrowser'
   s.author = { 'Michael Waterfall' => 'michaelwaterfall@gmail.com' }
-  s.social_media_url = 'https://twitter.com/mwaterfall'
 
   s.source = {
     :git => 'https://github.com/justin4765/MWPhotoBrowser.git',
